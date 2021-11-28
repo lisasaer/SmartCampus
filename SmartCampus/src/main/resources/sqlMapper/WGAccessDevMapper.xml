@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.WGAccessDevMapper" >
+    <!-- 增加微耕门禁-->
+    <insert id="addWGAccessDev">
+        insert into wgAccessDev_info(school,house,floor,room,id,ctrlerSN,ip,port,netmask,defaultGateway,macAddress,driverVerID,verDate,onLine,onUse,status)
+        values (#{school},#{house},#{floor},#{room},#{id},#{ctrlerSN},#{ip},#{port},#{netmask},#{defaultGateway},#{macAddress},#{driverVerID},#{verDate},#{onLine},#{onUse},#{status})
+    </insert>
+
+    <!-- 删除微耕门禁-->
+    <delete id="delWGAccessDev">
+        delete from wgAccessDev_info where id=#{id}
+    </delete>
+
+    <select id="queryWGAccessDevInfo" resultType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select * from wgAccessDev_info
+        <if test="limit != null and offset != null ">
+            limit #{offset},#{limit}
+        </if>
+
+    </select>
+
+<!--    查询所有设备的数量-->
+    <select id="queryWGDevCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select count(*) from wgAccessDev_info
+        where 1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="status != null and status != '' ">
+            and status = #{status}
+        </if>
+    </select>
+
+    <select id="queryWGAccessDevInfoByID" resultType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select * from wgAccessDev_info where id = #{id}
+    </select>
+
+    <select id="queryWGAccessDevInfoByJSON" resultType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select * from wgaccessdev_info  where 1=1
+        <if test="ctrlerSN != null and ctrlerSN != ''">
+           and ctrlerSN = #{ctrlerSN}
+        </if>
+    </select>
+
+    <select id="queryWGAccessDevInfoByDepartmentId" resultType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select * from wgAccessDev_info where departmentId = #{departmentId}
+    </select>
+    <!--/*select a.devname "title",a.ctrlerSN "value",b.dName "departmentName"
+    FROM wgaccess_door a
+    LEFT JOIN department b ON a.departmentId=b.departmentId
+    WHERE b.departmentId=#{0}*/-->
+    <select id="selectDeviceByDepartmentId" parameterType="java.lang.Integer" resultType="com.zy.SmartCampus.polo.manageDeviceBean">
+
+        select a.doorName "title",a.ctrlerSN "value",b.dName "departmentName"
+        FROM wgaccess_door a left join wgAccessDev_info c on a.ctrlerSN=c.ctrlerSN left join department b on c.departmentId=b.departmentId where b.departmentId=#{0}
+
+    </select>
+<!--    编辑微耕设备的所在区域-->
+    <update id="updateWGAccessDev">
+        update wgAccessDev_info
+        <set>
+            school = #{school},
+            house = #{house},
+            floor = #{floor},
+            room = #{room}
+
+        </set>
+        where ctrlerSN = #{ctrlerSN}
+    </update>
+<!--    通过所选的位置查询微耕设备-->
+    <select id="queryWGDevByArea" resultType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select * from wgAccessDev_info where  1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="status != null and status != '' ">
+            and status = #{status}
+        </if>
+    </select>
+
+    <!--    通过序列号SN和IP查询微耕设备-->
+    <select id="queryWGDevBySNorIP" resultType="com.zy.SmartCampus.polo.WGAccessDevInfo">
+        select * from wgAccessDev_info where 1=1
+        <if test="SNorIP != null and SNorIP != '' ">
+            and ctrlerSN = #{SNorIP}
+        </if>
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="status != null and status != '' ">
+            and status = #{status}
+        </if>
+        union
+        select * from wgAccessDev_info where 1=1
+        <if test="SNorIP != null and SNorIP != '' ">
+            and ip = #{SNorIP}
+        </if>
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="status != null and status != '' ">
+            and status = #{status}
+        </if>
+    </select>
+</mapper>
+
+
+

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.LoraDevMapper" >
+    <!-- 增加Lora网关设备-->
+    <insert id="addLoraDev">
+        insert into dev_info_lora(loraSN,ip,port,netmask,defaultGateway,macAddress,onLine,seqNumber,fwVer,sub1gNum,switchGroupNum,school,house,floor )
+        values (#{loraSN},#{ip},#{port},#{netmask},#{defaultGateway},#{macAddress},"在线","0000",#{fwVer},#{sub1gNum},0,#{school},#{house},#{floor})
+    </insert>
+
+    <!-- 删除Lora网关（2020-5-26，hhp）-->
+    <delete id="delLoraDev">
+        delete from dev_info_lora where id=#{id}
+    </delete>
+
+
+    <!-- 根据ID获取Lora网关信息（2020-5-28，hhp）-->
+    <select id="queryLoraDevByID" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select * from dev_info_lora
+        where id = #{id}
+    </select>
+
+    <!--//查询Lora网关设备信息（2020-5-18，hhp）-->
+    <select id="queryLoraDevInfo" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select * from dev_info_lora
+        order by id desc
+        <if test="limit != null and offset != null ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!--根据设备序列号查询Lora网关设备信息（2020-5-22，hhp）-->
+    <select id="queryLoraByDevSN" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select * from dev_info_lora where loraSN = #{loraSN}
+    </select>
+    <!--获取服务器向网关发送信息的流水号（2020-5-23，hhp）-->
+    <select id="querySEQByDevSN" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select seqNumber from dev_info_lora where loraSN = #{loraSN}
+    </select>
+
+    <!--  更新服务器向网关发送信息的流水号（2020-5-23，hhp） -->
+    <update id="updateSEQ">
+        update dev_info_lora set seqNumber = #{seqNumber} where loraSN = #{loraSN}
+    </update>
+
+    <!--  初次加载更新lora网关状态为离线(2020-5-27，hhp)  -->
+    <update id="updateOnLoadStatus">
+        update dev_info_lora
+        <set>
+            <if test="onLine != null and onLine != '' " >
+                onLine = #{onLine},
+            </if>
+        </set>
+    </update>
+    <!--  重启后更新lora网关状态为离线(2020-6-1，hhp)  -->
+    <update id="updateRestartStatus">
+        update dev_info_lora
+        <set>
+                onLine = #{onLine}
+        </set>
+        where loraSN = #{loraSN}
+    </update>
+    <!--  更新网关 -->
+    <update id="updateLora">
+        update dev_info_lora
+        <set>
+            <if test="school != null and school != '' " >
+                school = #{school},
+            </if>
+            <if test="house != null and house != '' " >
+                house = #{house},
+            </if>
+            <if test="floor != null and floor != '' " >
+                floor = #{floor},
+            </if>
+            <if test="switchGroupNum != null and switchGroupNum != '' " >
+                switchGroupNum = #{switchGroupNum},
+            </if>
+        </set>
+        where loraSN = #{loraSN}
+    </update>
+
+    <!--//根据Lora序列号查询终端通道数量（2020.5.28）-zyw-->
+    <select id="querySwitchGroupNum" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select distinct switchGroupNum from dev_info_lora
+        where loraSN = #{loraSN}
+    </select>
+    <!--根据校区、楼栋、楼层查询lora网关-->
+    <select id="queryLoraDevByFloor" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select * from dev_info_lora  where  school = #{school}
+        <if test="floor!=null and floor!=''">
+            and  floor = #{floor}
+        </if>
+        <if test="house!=null and house!=''">
+            and  house = #{house}
+        </if>
+    </select>
+
+    <!--//根据区域查询Lora网关（2020.6.3）-zyw-->
+    <select id="queryLoraDevByArea" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select * from dev_info_lora where  1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="onLine != null and onLine != '' ">
+            and onLine = #{onLine}
+        </if>
+
+    </select>
+
+    <select id="selectLoraDevInfoCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select count(*) from dev_info_lora
+        where 1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="onLine != null and onLine != '' ">
+            and onLine = #{onLine}
+        </if>
+    </select>
+
+</mapper>
+
+
+

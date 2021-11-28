@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.VideoMapper" >
+    <!-- 增加监控-->
+    <insert id="insertVideo">
+        insert into video_info(id,devName,username,password,port,ip,treeID,createDate,schoolId,houseId,floorId,roomId,devType,netMask,gateWay,iconCls,pId)
+        values (#{id},#{devName},#{username},#{password},#{port},#{ip},#{treeID},#{createDate},#{schoolId},#{houseId},#{floorId},#{roomId},#{devType},#{netMask},#{gateWay},#{iconCls},#{pId})
+    </insert>
+
+    <!-- 删除监控-->
+    <delete id="delVideo">
+        delete from video_info where id=#{id}
+    </delete>
+
+    <!--//查询全部监控设备信息-->
+    <select id="queryAllVideoDev" resultType="com.zy.SmartCampus.polo.VideoInfo">
+        select * from video_info
+        order by id desc
+        <if test="limit != null and offset != null ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!-- 根据区域查询监控 -->
+    <select id="queryVideo" resultType="com.zy.SmartCampus.polo.VideoInfo">
+        select * ,DATE_FORMAT(createDate,'%Y-%c-%d %T')AS strCreateDate from video_info where 1=1
+        <if test="id != null and id != '' ">
+            AND id =#{id}
+        </if>
+        <if test="ip != null and ip != '' ">
+            and ip LIKE "%"#{ip}"%"
+        </if>
+        <if test="devName != null and devName != '' ">
+            or devName LIKE "%"#{devName}"%"
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            AND devStatus =#{devStatus}
+        </if>
+        GROUP BY createDate DESC
+
+    </select>
+
+<!--    查询全部监控设备数量-->
+    <select id="queryVideoDevCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.VideoInfo">
+        select count(*) from video_info
+        where 1=1
+        <if test="ip != null and ip != '' ">
+            and ip LIKE "%"#{ip}"%"
+        </if>
+        <if test="devName != null and devName != '' ">
+            or devName LIKE "%"#{devName}"%"
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            and schoolId = #{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            and houseId = #{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            and floorId = #{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            and roomId =#{roomId}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            and devStatus = #{devStatus}
+        </if>
+    </select>
+
+    <update id="updateVideo">
+        update video_info set devName = #{devName},devType = #{devType},
+        username = #{username},password = #{password},schoolId=#{schoolId},houseId=#{houseId},floorId=#{floorId},roomId=#{roomId}
+        where id = #{id}
+    </update>
+
+</mapper>
+
+
+

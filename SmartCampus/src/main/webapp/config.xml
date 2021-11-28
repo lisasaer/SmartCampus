@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <!-- 日志是否打印txt ； 0 否 ，1 是-->
+    <printfOut>0</printfOut>
+    <!--TCP监听zigBee通讯的端口-->
+    <TCPServerPort>43219</TCPServerPort>
+</config>

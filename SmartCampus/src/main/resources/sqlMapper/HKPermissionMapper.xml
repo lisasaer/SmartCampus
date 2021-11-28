@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.HKPermissionMapper">
+
+    <select id="queryPermissionAll" resultType="com.zy.SmartCampus.polo.HKPermisson">
+        SELECT p.`perId`,s.staffId,s.`cardNo`,s.`name` staffName,
+       dh.`dname` devName,p.devIP dip
+        FROM permission p
+        LEFT JOIN dev_info_hk dh ON dh.`deviceId`=p.`devId`
+        LEFT JOIN staff s ON s.`cardNo` = p.`cardId`
+
+        WHERE 1=1
+
+        <if test="name != null and name != '' ">
+            and s.`name` LIKE "%"#{name}"%"
+        </if>
+<!--        <if test="staffId != null and staffId != '' ">-->
+<!--            or dh.`dname` LIKE "%"#{devName}"%"-->
+<!--        </if>-->
+        <if test="cardNo != null and cardNo != '' ">
+            or s.`cardNo` LIKE "%"#{cardNo}"%"
+        </if>
+        <if test="dname != null and dname != '' ">
+            or dh.`dname` LIKE "%"#{dname}"%"
+        </if>
+        <if test="dip != null and dip != '' ">
+            or p.devIP LIKE "%"#{dip}"%"
+        </if>
+
+        GROUP BY p.`perId`
+        ORDER BY staffId
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit ${offset},${limit}
+        </if>
+    </select>
+
+    <delete id="deletePermission">
+        delete from permission
+        where cardId = #{cardId}
+    </delete>
+
+    <select id="getPermissionByCardNo"  resultType="com.zy.SmartCampus.polo.HKPermisson">
+        select * from permission where cardId = #{cardId}
+    </select>
+    <select id="getPermissionByDevIP"  resultType="com.zy.SmartCampus.polo.HKPermisson">
+        select devId,cardId cardNo,devIP dip from permission where devIP = #{devIP}
+    </select>
+    <select id="getPermissionByDevId"  resultType="com.zy.SmartCampus.polo.HKPermisson">
+        select devId,cardId cardNo from permission where devId = #{devId}
+    </select>
+
+    <select id="getAllPermission"  resultType="com.zy.SmartCampus.polo.HKPermisson">
+        select * from staff_permission_view where 1=1
+    </select>
+
+    <insert id="insertPermission">
+        insert into permission (devId,cardId,devIP) values (#{devId},#{cardNo},#{dip})
+    </insert>
+
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(*) from staff_permission_view
+    </select>
+
+<!--    where 1=1
+        <if test="limit != null and limit != '' ">
+            limit #{offset} ,#{limit}
+        </if>-->
+
+    <select id="getHistoryFaceAlarm" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        select * from historyFaceAlarm_view
+    </select>
+
+
+</mapper>

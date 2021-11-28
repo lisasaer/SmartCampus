@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.StaffMapper">
+    <resultMap id="BaseResultMap" type="com.zy.SmartCampus.polo.Staff">
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="VARCHAR"/>
+        <result column="telphone" property="telphone" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, name, sex, department, telphone, email
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zy.SmartCampus.polo.StaffExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from staff
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.StatementBean">
+        select count(*) from staff
+        <where>
+            <if test="departmentId!=null">
+                departmentId=#{departmentId}
+            </if>
+            <if test="name!=null">
+                And `name`=#{name}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectStaffDetailAll" parameterType="java.util.HashMap" resultType="com.zy.SmartCampus.polo.StaffDetail">
+<!--        SELECT a.staffId,a.qq,a.workState,a.departmentId,a.`name`,a.sex,a.birth,a.telphone,a.email,a.photo,a.cardNo,a.positionId-->
+<!--        FROM  staff a-->
+<!--        LEFT JOIN department b ON a.departmentId=b.departmentId-->
+<!--        WHERE 1=1-->
+<!--        ORDER BY staffId DESC-->
+<!--        <if test="start!=null and size!=null">-->
+<!--            limit #{start},#{size}-->
+<!--        </if>-->
+
+        select a.* ,DATE_FORMAT(createdTime,'%Y-%c-%d %T')AS strCreatedTime ,DATE_FORMAT(updatedTime,'%Y-%c-%d %T')AS strUpdatedTime FROM staff a
+        order by createdTime desc
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="selectRecordAll" parameterType="java.util.HashMap" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        SELECT h.*,
+        date_format(alarmTime,'%Y-%c-%d %T')as alarmTime
+        FROM  historyfacealarm h
+
+        ORDER by date_format(alarmTime,'%Y-%c-%d %T') DESC
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+<!--    添加人员用户  -->
+    <insert id="addStaff">
+        INSERT INTO staff (staffId,name,sex,birth,telphone,email,photo,qq,cardNo,schoolId,houseId,floorId,roomId,createdTime,updatedTime,remark,personType) VALUES
+        (#{staffId},#{name},#{sex},#{birth},#{telphone},#{email},#{photo},#{qq},#{cardNo},#{schoolId},#{houseId},#{floorId},#{roomId},#{createdTime},#{updatedTime},#{remark},#{personType})
+    </insert>
+
+    <select id="queryRecordDetail" resultType="com.zy.SmartCampus.polo.Staff">
+        SELECT f.*,DATE_FORMAT(alarmTime,'%Y-%c-%d %T')AS strAlarmTime,a.`sex`,a.`qq`,a.`birth`,a.`telphone`,a.`email`,a.`personType`
+        FROM facealarm f
+        LEFT JOIN staff a ON a.staffId = f.staffId
+        WHERE f.id = #{id}
+    </select>
+    <select id="queryRecordHistoryDetail" resultType="com.zy.SmartCampus.polo.Staff">
+        SELECT h.*,DATE_FORMAT(alarmTime,'%Y-%c-%d %T')AS strAlarmTime,a.`sex`,a.`qq`,a.`birth`,a.`telphone`,a.`email`,a.`personType`
+        FROM historyfacealarm h
+        LEFT JOIN staff a ON a.staffId = h.staffId
+        WHERE h.id = #{id}
+    </select>
+
+    <select id="selectStaffDetail" parameterType="java.lang.String" resultType="com.zy.SmartCampus.polo.StaffDetail">
+        select a.* ,DATE_FORMAT(createdTime,'%Y-%c-%d %T')AS strCreatedTime ,DATE_FORMAT(updatedTime,'%Y-%c-%d %T')AS strUpdatedTime FROM staff a
+
+        WHERE a.staffId=#{id}
+        order by createdTime desc
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from staff
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from staff
+        where staffId = #{id}
+    </delete>
+
+    <delete id="deleteRecord">
+        delete from  historyfacealarm
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteByExample" parameterType="com.zy.SmartCampus.polo.StaffExample">
+        delete from staff
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+
+    <select id="selectStaffNameByDepartmentId" parameterType="java.lang.Integer" resultType="java.lang.String">
+        select name from staff where departmentId = #{0}
+    </select>
+
+
+    <select id="selectStaffNameByDepartmentIdCard" parameterType="java.lang.Integer" resultType="com.zy.SmartCampus.polo.ManageCardBean">
+        select a.cardNo "cardId",a.staffId "value",a.name "title",b.dName "departmentName",a.photo "photo" ,a.id "id"
+        FROM staff a
+        LEFT JOIN department b ON a.departmentId=b.departmentId
+        WHERE b.departmentId=#{0}
+
+    </select>
+
+
+    <select id="queryphotoByCardId" resultType="java.lang.String">
+        select photo from staff where cardId=#{cardId}
+    </select>
+    <select id="getStaffSome" parameterType="com.zy.SmartCampus.polo.StatementBean" resultType="com.zy.SmartCampus.polo.StatementDetail">
+        select a.staffId,a.name,a.sex,b.dName,c.pName
+        from staff a,department b,position c
+        where a.departmentId = b.departmentId and b.positionId = c.positionId
+        <if test="departmentId!=null and departmentId!=''">
+            And a.departmentId=#{departmentId}
+        </if>
+        <if test="name!=null">
+            And `name`=#{name}
+        </if>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+    <insert id="insertSelective" parameterType="com.zy.SmartCampus.polo.Staff">
+        insert into staff
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="department != null">
+                department,
+            </if>
+            <if test="telphone != null">
+                telphone,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="department != null">
+                #{department,jdbcType=INTEGER},
+            </if>
+            <if test="telphone != null">
+                #{telphone,jdbcType=INTEGER},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zy.SmartCampus.polo.StaffExample" resultType="java.lang.Integer">
+        select count(*) from staff
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateStaff" parameterType="com.zy.SmartCampus.polo.Staff">
+        update staff set cardNo = #{cardNo},name = #{name},sex = #{sex},
+        telphone = #{telphone},email = #{email},birth = #{birth},qq = #{qq},photo=#{photo},schoolId=#{schoolId},houseId=#{houseId},floorId=#{floorId},roomId=#{roomId},
+        remark=#{remark},personType=#{personType},updatedTime=#{updatedTime}
+        where staffId = #{staffId};
+    </update>
+    <update id="updateByExampleSelective" parameterType="map">
+        update staff
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sex != null">
+                sex = #{record.sex,jdbcType=VARCHAR},
+            </if>
+            <if test="record.department != null">
+                department = #{record.department,jdbcType=INTEGER},
+            </if>
+            <if test="record.telphone != null">
+                telphone = #{record.telphone,jdbcType=INTEGER},
+            </if>
+            <if test="record.email != null">
+                email = #{record.email,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update staff
+        set id = #{record.id,jdbcType=INTEGER},
+        name = #{record.name,jdbcType=VARCHAR},
+        sex = #{record.sex,jdbcType=VARCHAR},
+        department = #{record.department,jdbcType=INTEGER},
+        telphone = #{record.telphone,jdbcType=INTEGER},
+        email = #{record.email,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zy.SmartCampus.polo.Staff">
+        update staff
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="department != null">
+                department = #{department,jdbcType=INTEGER},
+            </if>
+            <if test="telphone != null">
+                telphone = #{telphone,jdbcType=INTEGER},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zy.SmartCampus.polo.Staff">
+        update staff
+        set name = #{name,jdbcType=VARCHAR},
+        sex = #{sex,jdbcType=VARCHAR},
+        department = #{department,jdbcType=INTEGER},
+        telphone = #{telphone,jdbcType=INTEGER},
+        email = #{email,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="queryStaff" resultType="com.zy.SmartCampus.polo.StaffDetail">
+        select a.* ,DATE_FORMAT(createdTime,'%Y-%c-%d %T')AS strCreatedTime ,DATE_FORMAT(updatedTime,'%Y-%c-%d %T')AS strUpdatedTime
+        FROM staff a
+        WHERE 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+
+        <if test="schoolId != null and schoolId != '' ">
+            and schoolId = #{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            and houseId = #{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            and floorId = #{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            and roomId = #{roomId}
+        </if>
+        <if test="personType != null and personType != '' ">
+            and personType = #{personType}
+        </if>
+
+        <if test="cardNo != null and cardNo != '' ">
+            and cardNo LIKE "%"#{cardNo}"%"
+        </if>
+        <if test="name != null and name != '' ">
+            OR name LIKE "%"#{name}"%"
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            OR staffId LIKE "%"#{staffId}"%"
+        </if>
+        ORDER BY createdTime DESC
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit ${offset},${limit}
+        </if>
+
+    </select>
+    <!--   查询人员条数  (2020-6-15,hhp)-->
+    <select id="queryStaffCount" resultType="java.lang.Integer">
+        select count(*) FROM  staff a ,department b,position c
+        WHERE a.departmentId=b.departmentId and a.positionId=c.positionId
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="name != null and name != '' ">
+            and name = #{name}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffId = #{staffId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardNo = #{cardNo}
+        </if>
+        <if test="dName != null and dName != '' ">
+            and dName = #{dName}
+        </if>
+    </select>
+    <!--   根据条件查询历史刷卡记录 (2020-6-15,hhp)   -->
+    <select id="queryHistoryRecord" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        SELECT h.*,
+        date_format(alarmTime,'%Y-%c-%d %T')as strAlarmTime
+        FROM  historyfacealarm h
+        where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="staffName != null and staffName != '' ">
+            and staffName = #{staffName}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffId = #{staffId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardNo = #{cardNo}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &gt;= date_format(#{startTime},'%Y-%c-%d %T')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &lt;= date_format(#{endTime},'%Y-%c-%d %T')
+        </if>
+        ORDER by date_format(alarmTime,'%Y-%c-%d %T') DESC
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit ${offset},${limit}
+        </if>
+
+    </select>
+    <!--   查询历史刷卡记录条数  (2020-6-15,hhp)-->
+    <select id="queryHistoryRecordCount" resultType="java.lang.Integer">
+        select count(*) from historyfacealarm h
+        where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="staffName != null and staffName != '' ">
+            and staffName = #{staffName}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffId = #{staffId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardNo = #{cardNo}
+        </if>
+        <if test="dName != null and dName != '' ">
+            and dName = #{dName}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &gt;= date_format(#{startTime},'%Y-%c-%d %T')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &lt;= date_format(#{endTime},'%Y-%c-%d %T')
+        </if>
+    </select>
+    <!--   根据条件查询实时刷卡记录 (2020-6-16,hhp)   -->
+    <select id="queryRecord" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        SELECT h.*,/*d.dName,e.`dposition`,*/
+        date_format(alarmTime,'%Y-%c-%d %T')as strAlarmTime
+        FROM  facealarm h
+      /*  LEFT JOIN department d ON d.departmentId = h.departmentId
+        LEFT JOIN dev_info_hk e ON e.dip = h.devIP*/
+        where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="staffName != null and staffName != '' ">
+            and staffName = #{staffName}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffId = #{staffId}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardNo = #{cardNo}
+        </if>
+
+        <if test="startTime != null and startTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &gt;= date_format(#{startTime},'%Y-%c-%d %T')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &lt;= date_format(#{endTime},'%Y-%c-%d %T')
+        </if>
+        ORDER by date_format(alarmTime,'%Y-%c-%d %T') DESC
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit ${offset},${limit}
+        </if>
+
+    </select>
+
+    <!--   查询刷卡记录条数  (2020-6-16,hhp)-->
+    <select id="queryRecordCount" resultType="java.lang.Integer">
+        select count(*) from facealarm h
+        where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="staffName != null and staffName != '' ">
+            and staffName = #{staffName}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffId = #{staffId}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardNo = #{cardNo}
+        </if>
+
+        <if test="startTime != null and startTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &gt;= date_format(#{startTime},'%Y-%c-%d %T')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date_format(alarmTime,'%Y-%c-%d %T') &lt;= date_format(#{endTime},'%Y-%c-%d %T')
+        </if>
+        ORDER by date_format(alarmTime,'%Y-%c-%d %T') DESC
+    </select>
+
+    <select id="queryCardNo" resultType="com.zy.SmartCampus.polo.StaffDetail">
+        select * from staff
+        where cardNo = #{cardNo}
+    </select>
+    <select id="queryByStaffId" resultType="com.zy.SmartCampus.polo.StaffDetail">
+        select * from staff
+        where staffId = #{staffId}
+    </select>
+    <select id="queryStaffName" resultType="com.zy.SmartCampus.polo.StaffDetail">
+        select * from staff
+        where name = #{name}
+    </select>
+
+    <select id="queryStaffByDepartmentId" resultType="com.zy.SmartCampus.polo.StaffDetail">
+        select * from staff
+        where departmentId = #{departmentId}
+    </select>
+
+    <select id="selectRecord" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        SELECT h.*,d.dname devName,
+        date_format(alarmTime,'%Y-%c-%d %T')as strAlarmTime
+        FROM  historyfacealarm h
+        LEFT JOIN dev_info_hk d ON d.dip = h.devIP
+        where 1=1
+        ORDER by date_format(alarmTime,'%Y-%c-%d %T') DESC
+        limit 0,6
+    </select>
+    <select id="selectPicture" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        SELECT h.*,
+        date_format(alarmTime,'%Y-%c-%d %T')as alarmTime
+        FROM  historyfacealarm h
+        where 1=1
+        ORDER by date_format(alarmTime,'%Y-%c-%d %T') DESC
+        limit 0,3
+    </select>
+</mapper>

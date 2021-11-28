@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <!--    1.组件扫描器    -->
+    <!-- 配置controller扫描包，多个包之间用,分隔 -->
+    <context:component-scan base-package="com.zy.SmartCampus.controller"></context:component-scan>
+
+    <!--    2.注解映射器和适配器   -->
+    <!-- 开启mvc 注解驱动 省去配置处理器映射器和处理器适配器-->
+    <mvc:annotation-driven />
+    <mvc:resources mapping="/fileDir/**" location="/fileDir/"/>
+    <!--    3.视图解析器     -->
+    <!-- 视图解析器 解析jsp解析，默认使用jstl标签，classpath下的得有jstl的包-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- 配置jsp路径的前缀 -->
+        <property name="prefix" value="/WEB-INF/views/"></property>
+        <!-- 配置jsp路径的后缀 -->
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+
+    <bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver" >
+        <property name="maxUploadSize" value="104857600"/>
+        <property name="defaultEncoding" value="utf-8"/>
+        <property name="maxInMemorySize" value="40960"/>
+    </bean>
+
+    <!-- 开启注解. 扫描 -->
+    <context:annotation-config></context:annotation-config>
+
+    <!-- 过滤掉js, jpg, png, css, 静态文件 -->
+    <mvc:default-servlet-handler/>
+
+    <!-- 资源映射 -->
+    <mvc:resources location="/WEB-INF/res/" mapping="/res/**"/>
+
+</beans>

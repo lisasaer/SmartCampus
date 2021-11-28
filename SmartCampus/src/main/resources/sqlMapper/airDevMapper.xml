@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.AirDevMapper" >
+
+    <!--//查询全部空调设备信息-->
+    <select id="queryAllAirDev" resultType="com.zy.SmartCampus.polo.AirInfo">
+        select * from dev_info_air
+        order by id desc
+        <if test="limit != null and offset != null ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!--//根据区域查询空调设备信息-->
+    <select id="queryAirDevInfo" resultType="com.zy.SmartCampus.polo.AirInfo">
+        select * from dev_info_air
+        where 1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            and devStatus = #{devStatus}
+        </if>
+    </select>
+
+<!--    查询设备数量-->
+    <select id="queryAirDevCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.AirInfo">
+        select count(*) from dev_info_air
+        where 1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            and devStatus = #{devStatus}
+        </if>
+    </select>
+    <!--  添加空调设备  -->
+    <insert id="addAirDev">
+        insert into dev_info_air(loraSN,uuid,devName,devStatus,devId,school,house,floor,room)
+        values (#{loraSN},#{uuid},#{devName},#{devStatus},#{devId},#{school},#{house},#{floor},#{room})
+    </insert>
+
+    <select id="queryAirDevInfoByUuid" resultType="com.zy.SmartCampus.polo.AirInfo">
+        select * from dev_info_air where uuid = #{uuid}
+    </select>
+
+    <update id="updateAirDev">
+        update dev_info_air
+        <set>
+            <if test="devName != null and devName != '' " >
+                devName = #{devName},
+            </if>
+            <if test="devStatus != null and devStatus != '' " >
+                devStatus = #{devStatus},
+            </if>
+        </set>
+        where uuid = #{uuid}
+    </update>
+    <!--  //删除设备  -->
+    <delete id="delAirDev">
+        delete from dev_info_air where uuid = #{uuid}
+    </delete>
+    <delete id="delAirDevByLoraSN">
+        delete from dev_info_air where loraSN = #{loraSN}
+    </delete>
+</mapper>

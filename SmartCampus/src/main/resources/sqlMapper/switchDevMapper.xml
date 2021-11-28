@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.switchDevMapper">
+
+    <!--//查询空开设备信息（2020-5-28，zyw）-->
+    <select id="queryswitchDevInfo" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select * from dev_info_switch
+        order by id desc
+        <if test="limit != null and offset != null ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!--    查询空开设备数量-->
+    <select id="queryswitchDevCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select count(*) from dev_info_switch
+        where 1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            and devStatus = #{devStatus}
+        </if>
+    </select>
+
+    <!--//根据通讯地址查询空开设备（2020.5.28）-zyw-->
+    <select id="queryDevByUuid" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select * from dev_info_switch where  devid = #{uuid}
+    </select>
+    <!--//根据loraSN查询空开设备（2020.6.3）-zyw-->
+    <select id="queryDevByloraSN" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select * from dev_info_switch where  loraSN = #{loraSN}
+    </select>
+
+
+    <!--//根据区域查询空开设备（2020.6.3）-zyw-->
+    <select id="queryswitchDevByArea" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select * from dev_info_switch where  1=1
+        <if test="school != null and school != '' ">
+            and school = #{school}
+        </if>
+        <if test="house != null and house != '' ">
+            and house = #{house}
+        </if>
+        <if test="floor != null and floor != '' ">
+            and floor = #{floor}
+        </if>
+        <if test="room != null and room != '' ">
+            and room = #{room}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            and devStatus = #{devStatus}
+        </if>
+        <if test="loraSN != null and loraSN != '' ">
+            and loraSN like "%"#{loraSN}"%"
+        </if>
+
+    </select>
+
+    <!--//查询Lora序列号（2020.5.28）-zyw-->
+    <select id="queryswitchLoraSN" resultType="com.zy.SmartCampus.polo.LoraDevInfo">
+        select loraSN,switchGroupNum from dev_info_lora
+    </select>
+    <!--//根据Lora序列号查询终端通道数量（2020.5.28）-zyw-->
+    <select id="querySwitchGroupNum" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select distinct switchGroupNum from dev_info_switch
+        where loraSN= #{loraSN}
+    </select>
+
+    <!--//添加空开设备信息（2020-5-28，zyw）-->
+    <insert id="addSwitchDev">
+        insert into dev_info_switch(school,house,floor,room,loraSN,switchGroupNum,uuid,sensortype,intervaltime,port,chncnt,chntype,devId,devStatus)
+        values (#{school},#{house},#{floor},#{room},#{loraSN},#{switchGroupNum},#{uuid},#{sensortype},#{intervaltime},#{port},#{chncnt},#{chntype},#{devId},#{devStatus})
+    </insert>
+
+    <!--//删除设备-->
+    <delete id="delSwitchDev">
+        delete from dev_info_switch where 1=1
+        <if test="loraSN != null and loraSN != '' ">
+            and loraSN = #{loraSN}
+        </if>
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+    </delete>
+
+    <!--//修改空开设备信息（2020-5-28，zyw）-->
+    <update id="updateSwitchDev">
+        update dev_info_switch
+        <set>
+            <if test="loraSN != null and loraSN != '' ">
+                loraSN = #{loraSN},
+            </if>
+            <if test="switchGroupNum != null and switchGroupNum != '' ">
+                switchGroupNum = #{switchGroupNum},
+            </if>
+            <if test="uuid != null and uuid != '' ">
+                uuid = #{uuid},
+            </if>
+            <if test="sensortype != null and sensortype != '' ">
+                sensortype = #{sensortype},
+            </if>
+            <if test="intervaltime != null and intervaltime != '' ">
+                intervaltime = #{intervaltime},
+            </if>
+            <if test="port != null and port != '' ">
+                port = #{port},
+            </if>
+            <if test="devId != null and devId != '' ">
+                devId = #{devId},
+            </if>
+            <if test="chncnt != null and chncnt != '' ">
+                chncnt = #{chncnt},
+            </if>
+            <if test="chntype != null and chntype != '' ">
+                chntype = #{chntype},
+            </if>
+            <if test="devStatus != null and devStatus != '' ">
+                devStatus = #{devStatus},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateSwitchDevByLoraSN">
+        update dev_info_switch
+        <set>
+            <if test="school != null and school != '' " >
+                school = #{school},
+            </if>
+            <if test="house != null and house != '' " >
+                house = #{house},
+            </if>
+            <if test="floor != null and floor != '' " >
+                floor = #{floor},
+            </if>
+        </set>
+        where loraSN = #{loraSN}
+    </update>
+    <select id="queryDevByDevId" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select * from dev_info_switch where devId = #{devId}
+    </select>
+
+
+    <select id="queryDevInfoByUuid" resultType="com.zy.SmartCampus.polo.SwitchDevInfo">
+        select * from dev_info_switch where uuid = #{uuid}
+    </select>
+
+    <!--  添加开关  -->
+    <insert id="addSwitch">
+        insert into switch_info(loraSN,switchAddress,switchName,recordTime,switchStatus,devId,lineVoltage,lineCurrent,
+        linePower,leakageCurrent,moduleTemperature)
+        values (#{loraSN},#{switchAddress},#{switchName},#{recordTime},#{switchStatus},#{devId},#{lineVoltage},#{lineCurrent},
+        #{linePower},#{leakageCurrent},#{moduleTemperature})
+    </insert>
+    <!--根据空开线路地址和空开设备ID查询空开线路详细信息(2020-5-11,HHP)-->
+    <select id="queryDetailByDevId" resultType="com.zy.SmartCampus.polo.SwitchInfo">
+        select devSN,devId,switchAddress,switchName,switchStatus ,
+        date_format(recordTime,'%Y-%c-%d %T')as recordTime,
+        lineVoltage,lineCurrent,linePower,leakageCurrent,moduleTemperature
+        from switch_info where 1=1
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        <if test="switchAddress != null and switchAddress != '' ">
+            and switchAddress = #{switchAddress}
+        </if>
+    </select>
+    <!-- 更新开关数据 -->
+    <update id="updateNewData">
+        update switch_info
+        <set>
+            lineVoltage = #{lineVoltage},
+            lineCurrent = #{lineCurrent},
+            linePower = #{linePower},
+            leakageCurrent = #{leakageCurrent},
+            moduleTemperature = #{moduleTemperature},
+            dataUpTime=now()
+        </set>
+        where devId = #{devId} and switchAddress=#{switchAddress}
+    </update>
+    <!--  查找开关by 设备id  -->
+    <select id="querySwitch" resultType="com.zy.SmartCampus.polo.SwitchInfo">
+        select id,loraSN,switchAddress,switchName,devId,switchStatus,
+        date_format(recordTime,'%Y-%c-%d %T')as recordTime,
+        lineVoltage,lineCurrent,linePower,leakageCurrent,moduleTemperature
+        from switch_info where 1=1
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        order by switchAddress ASC
+        <if test="limit != null and offset != null ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!--    查询开关数量-->
+    <select id="querySwitchCount" resultType="java.lang.Integer" parameterType="com.zy.SmartCampus.polo.SwitchInfo">
+        select count(*) from switch_info
+        where 1=1
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+    </select>
+
+    <!--  更新开关  -->
+    <update id="updateSwitch">
+        update switch_info
+        <set>
+            <if test="switchStatus != null and switchStatus != '' " >
+                switchStatus = #{switchStatus},
+            </if>
+            <if test="switchName != null and switchName != '' " >
+                switchName = #{switchName},
+            </if>
+            <if test="devId != null and devId != '' " >
+                devId = #{devId},
+            </if>
+            recordTime = now()
+        </set>
+        where 1=1
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        <if test="loraSN != null and loraSN != '' ">
+            and loraSN = #{loraSN}
+        </if>
+        <if test="switchAddress != null and switchAddress != '' ">
+            and switchAddress = #{switchAddress}
+        </if>
+    </update>
+    <update id="updateSwitchInfo">
+        update switch_info
+        <set>
+            <if test="devId != null and devId != '' " >
+                devId = #{devId},
+            </if>
+        </set>
+        where 1=1
+        <if test="loraSN != null and loraSN != '' ">
+            and loraSN = #{loraSN}
+        </if>
+    </update>
+    <!--删除开关-->
+    <delete id="deleteSwitch">
+        delete from switch_info where 1=1
+        <if test="loraSN != null and loraSN != '' ">
+            and loraSN = #{loraSN}
+        </if>
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+    </delete>
+    <!--根据开关地址（switchAddress）查询开关-->
+    <select id="querySwitchByAddress" resultType="com.zy.SmartCampus.polo.SwitchInfo">
+        select * from switch_info where switchAddress=#{switchAddress} and devId=#{devId}
+    </select>
+    <!--将开关的实时数据存入历史表!-->
+    <insert id="addSwitchDataToHistory">
+        insert  into switch_info_history (devSN,switchAddress,switchName,devId,recordTime,switchStatus,
+        lineCurrent,lineVoltage,linePower,leakageCurrent,moduleTemperature)
+        values (#{loraSN},#{switchAddress},#{switchName},#{devId},now(),#{switchStatus},
+        #{lineCurrent},#{lineVoltage},#{linePower},#{leakageCurrent},#{moduleTemperature})
+    </insert>
+
+    <!--查询昨日开关数据的功率-->
+    <select id="querySwitchPower" resultType="com.zy.SmartCampus.polo.SwitchInfo">
+        SELECT * FROM switch_info_history WHERE TO_DAYS( NOW( ) ) - TO_DAYS( recordTime) = 1 and linePower!=0
+    </select>
+</mapper>

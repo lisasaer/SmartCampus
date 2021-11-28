@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.WGOpenDoorMapper" >
+    <!-- 向微耕刷卡今日表插入实时数据-->
+    <insert id="addTodayWGAccessDoorOpen">
+        insert into wgaccess_opendoor (id,ctrlerID,doorID,cardID,openDoorWay,isPass,direction,doorDateTime,username,schoolId,houseId,floorId,roomId)
+        values (#{id},#{ctrlerID},#{doorID},#{cardID},#{openDoorWay},#{isPass},#{direction},#{doorDateTime},#{username},#{schoolId},#{houseId},#{floorId},#{roomId})
+    </insert>
+
+    <!-- 向微耕刷卡历史表插入实时数据-->
+    <insert id="addWGAccessDoorOpen">
+        insert into wgaccess_opendoor_history(id,ctrlerID,doorID,cardID,openDoorWay,isPass,direction,doorDateTime,username,staffId,schoolId,houseId,floorId,roomId)
+        values (#{id},#{ctrlerID},#{doorID},#{cardID},#{openDoorWay},#{isPass},#{direction},#{doorDateTime},#{username},#{staffId},#{schoolId},#{houseId},#{floorId},#{roomId})
+    </insert>
+
+    <select id="queryWGOpenDoor" resultType="com.zy.SmartCampus.polo.WGAccessOpenDoor">
+        select wh.*,date_format(doorDateTime,'%Y-%c-%d %T')as strAlarmTime from wgaccess_opendoor_history wh where 1=1
+
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="staffName != null and staffName != '' ">
+            and username = #{staffName}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffID = #{staffId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardID = #{cardNo}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date_format(doorDateTime,'%Y-%c-%d %T') &gt;= date_format(#{startTime},'%Y-%c-%d %T')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date_format(doorDateTime,'%Y-%c-%d %T') &lt;= date_format(#{endTime},'%Y-%c-%d %T')
+        </if>
+        order by doorDateTime desc
+        <if test="limit != null and offset != null  ">
+            limit ${offset},${limit}
+        </if>
+    </select>
+
+    <select id="queryWGOpenDoorCount" resultType="java.lang.Integer">
+        select count(*) from wgaccess_opendoor_history wh where 1=1
+
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="staffName != null and staffName != '' ">
+            and username = #{staffName}
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            and staffID = #{staffId}
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            and cardID = #{cardNo}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date_format(doorDateTime,'%Y-%c-%d %T') &gt;= date_format(#{startTime},'%Y-%c-%d %T')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date_format(doorDateTime,'%Y-%c-%d %T') &lt;= date_format(#{endTime},'%Y-%c-%d %T')
+        </if>
+    </select>
+
+    <!--通过cardId查询使用者的姓名-->
+    <select id="queryUserNameByCardId" resultType="com.zy.SmartCampus.polo.Staff">
+        select * from staff  where staff.cardNo=#{cardNo}
+    </select>
+
+    <select id="queryRealTimeOpenDoor" resultType="com.zy.SmartCampus.polo.WGAccessOpenDoor">
+        select a.*,b.school,b.house,b.floor,b.room from wgaccess_opendoor a LEFT JOIN wgaccessdev_info b ON a.ctrlerID = b.ctrlerSN where 1=1 and doorDateTime>#{startDate}
+        order by doorDateTime desc
+        <if test="limit != null and offset != null  ">
+            limit ${offset},${limit}
+        </if>
+    </select>
+
+    <select id="getwgAccessDevRealCount" resultType="java.lang.Integer">
+        select count(*) from wgaccess_opendoor a LEFT JOIN wgaccessdev_info b ON a.ctrlerID = b.ctrlerSN where 1=1 and doorDateTime>#{startDate}
+
+    </select>
+
+</mapper>
+
+
+

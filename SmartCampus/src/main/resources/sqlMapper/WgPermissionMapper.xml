@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.WgPermissionMapper">
+
+    <!--insert into wgaccess_permission (cardNo,wgSNAndDoorID,creatDate) select #{cardNo},#{wgSNAndDoorID},now() from wgaccess_permission
+    where not exists (select * from wgaccess_permission where cardNo=#{cardNo} and wgSNAndDoorID=#{wgSNAndDoorID})-->
+    <!--insert into wgaccess_permission (cardNo,wgSNAndDoorID,creatDate) values (#{cardNo},#{wgSNAndDoorID},now())
+     where (select * from wgaccess_permission where cardNo = #{cardNo} and wgSNAndDoorID = #{wgSNAndDoorID}) is null -->
+    <!--向微耕权限表插入权限数据-->
+    <insert id="addWgPermission">
+            insert into wgaccess_permission (cardNo,wgSNAndDoorID,creatDate) values (#{cardNo},#{wgSNAndDoorID},now())
+
+    </insert>
+
+    <!--微耕权限表删除权限数据-->
+    <delete id="delWgPermission">
+        delete  from wgaccess_permission where 1=1
+            and cardNo = #{cardNo}
+            and wgSNAndDoorID = #{wgSNAndDoorID}
+    </delete>
+
+    <!--根据设备序列号删除设备所有权限数据-->
+    <delete id="delWgAllPermission">
+        delete  a from wgaccess_permission a
+        left join wgaccess_door d on a.wgSNAndDoorID = d.doorID left join wgaccessdev_info b on d.ctrlerSN = b.ctrlerSN where b.ctrlerSN = #{ctrlerSN}
+    </delete>
+
+    <!--获取全部权限信息-->
+    <select id="getWGPermission" resultType="com.zy.SmartCampus.polo.PermissionInfo">
+        select wp.*,DATE_FORMAT(creatDate,'%Y-%c-%d %T')AS strCreatedTime ,wd.doorName,wd.ctrlerSN from wgaccess_permission wp LEFT JOIN wgaccess_door wd ON wp.`wgSNAndDoorID`=wd.`doorID` order by cardNo ASC
+    </select>
+
+    <!--查询权限信息-->
+    <select id="getWGPermissionByCardNo" resultType="com.zy.SmartCampus.polo.PermissionInfo">
+        select * from wgaccess_permission where 1=1
+        <if test="cardNo != null and cardNo != ''">
+            and cardNo = #{cardNo}
+        </if>
+    </select>
+    <!--判断插入权限数据时是否重复的查询-->
+    <select id="getWGPermissionforExist" resultType="com.zy.SmartCampus.polo.PermissionInfo">
+        select * from wgaccess_permission where 1=1
+        <if test="cardNo != null and cardNo != ''">
+            and cardNo = #{cardNo}
+        </if>
+        <if test="wgSNAndDoorID != null and wgSNAndDoorID != ''">
+            and wgSNAndDoorID = #{wgSNAndDoorID}
+        </if>
+    </select>
+
+    <!--根据条件查询权限信息-->
+    <select id="getWGPermissionByJSON" resultType="com.zy.SmartCampus.polo.PermissionInfo">
+        SELECT wp.*,s.staffId,s.`cardNo`,s.`name`,
+        wd.`doorName`,wd.ctrlerSN
+        FROM wgaccess_permission wp
+        LEFT JOIN wgaccess_door wd ON wp.`wgSNAndDoorID`=wd.`doorID`
+        LEFT JOIN staff s ON s.`cardNo` = wp.`cardNo`
+
+        WHERE 1=1
+
+        <if test="name != null and name != '' ">
+            and s.`name` LIKE "%"#{name}"%"
+        </if>
+        <if test="cardNo != null and cardNo != '' ">
+            or s.`cardNo` LIKE "%"#{cardNo}"%"
+        </if>
+        <if test="staffId != null and staffId != '' ">
+            or s.`staffId` LIKE "%"#{staffId}"%"
+        </if>
+        <if test="doorName != null and doorName != '' ">
+            and wd.`doorName` LIKE "%"#{doorName}"%"
+        </if>
+        <if test="ctrlerSN != null and ctrlerSN != '' ">
+            or wd.ctrlerSN = #{ctrlerSN}
+        </if>
+
+        ORDER BY wp.cardNo
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit ${offset},${limit}
+        </if>
+    </select>
+</mapper>

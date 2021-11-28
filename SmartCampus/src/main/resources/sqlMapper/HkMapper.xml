@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.HkMapper">
+
+<!--    查找用户刷卡信息 by 卡号-->
+    <select id="getFaceAlarmInfo" resultType="java.util.Map">
+        select * from staff where cardNo = #{0}
+    </select>
+<!--    <select id="getFaceAlarmInfo" resultType="java.util.Map">-->
+<!--        select * from staff_card_view where cardNo = #{0}-->
+<!--    </select>-->
+    <insert id="insertFaceAlarm">
+        insert into faceAlarm (alarmTime,staffId,imagePath,cardNo,devIP,staffName,schoolId,houseId,floorId,roomId)
+        values (#{alarmTime},#{staffId},#{imagePath},#{cardNo},#{devIP},#{staffName},#{schoolId},#{houseId},#{floorId},#{roomId})
+    </insert>
+    <insert id="insertHistoryFaceAlarm">
+        insert into historyFaceAlarm (alarmTime,staffId,imagePath,cardNo,devIP,staffName,schoolId,houseId,floorId,roomId)
+        values (#{alarmTime},#{staffId},#{imagePath},#{cardNo},#{devIP},#{staffName},#{schoolId},#{houseId},#{floorId},#{roomId})
+    </insert>
+    <delete id="deleteRealRecord" >
+        delete from faceAlarm
+    </delete>
+    <select id="queryDate" resultType="com.zy.SmartCampus.polo.HistoryFaceAlarm">
+        SELECT alarmTime FROM facealarm GROUP BY alarmTime
+    </select>
+</mapper>

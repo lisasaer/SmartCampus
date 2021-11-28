@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.PermissionMapper" >
+    <!-- 查询所有的权限信息-->
+    <select id="queryPermission" resultType="com.zy.SmartCampus.polo.PermissionInfo">
+        select * from permission_info
+    </select>
+
+    <!-- 增加权限-->
+    <insert id="addPermissionInfo">
+        insert into permission_info(id,name,createDate,permissionNum)
+        values (#{id},#{name},#{createDate},#{permissionNum})
+    </insert>
+
+    <!-- 删除权限-->
+    <delete id="delPermission">
+        delete from permission_info where id=#{id}
+    </delete>
+
+</mapper>
+
+
+

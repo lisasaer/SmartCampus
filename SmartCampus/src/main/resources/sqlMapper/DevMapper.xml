@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.DevMapper" >
+
+    <!--  //更新设备  -->
+    <update id="updateDev">
+        update dev_info
+        <set>
+            <if test="devName != null and devName != '' " >
+                devName = #{devName},
+            </if>
+            <if test="devStatus != null and devStatus != '' " >
+                devStatus = #{devStatus},
+            </if>
+        </set>
+        where devSN = #{devSN}
+    </update>
+
+
+    <!--   //查找设备    -->
+    <select id="queryDev" resultType="com.zy.SmartCampus.polo.DevInfo">
+        select * from dev_info where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        <if test="devName != null and devName != '' ">
+            and devName = #{devName}
+        </if>
+        <if test="devType != null and devType != '' ">
+            and devType = #{devType}
+        </if>
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!--      //查找设备数量   -->
+    <select id="queryDevCount" resultType="java.lang.Integer">
+        select count(*) from dev_info where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        <if test="devName != null and devName != '' ">
+            and devName = #{devName}
+        </if>
+    </select>
+
+    <select id="queryOneDev" resultType="com.zy.SmartCampus.polo.DevInfo">
+        select * from dev_info where id = #{id}
+    </select>
+
+    <!-- //添加设备   -->
+    <insert id="insertDev">
+        insert into dev_info(devType,devName,devId,devPostion,lineCount,devSN)
+        values (#{devType},#{devName},#{devId},#{devPostion},#{lineCount},#{devSN})
+    </insert>
+
+    <!--  //删除设备  -->
+    <delete id="delDev">
+        delete from dev_info where id = #{0}
+    </delete>
+
+    <select id="queryDevByDevId" resultType="com.zy.SmartCampus.polo.DevInfo">
+        select * from dev_info where devId = #{devId}
+    </select>
+
+
+    <!--  //添加开关  -->
+    <insert id="insertSwitch">
+        insert  into switch_info(devSN,switchAddress,switchName,devId,recordTime,switchStatus)
+        values (#{devSN},#{switchAddress},#{switchName},#{devId},now(),"离线")
+    </insert>
+
+    <!--  //删除开关  -->
+    <delete id="delSwitch">
+        delete from switch_info where devSN = #{0}
+    </delete>
+
+    <!--  更新开关状态(HHP)  -->
+    <update id="updateSwitchStatus">
+        update switch_info
+        <set>
+            <if test="switchStatus != null and switchStatus != '' " >
+                switchStatus = #{switchStatus},
+            </if>
+        </set>
+        where devId=#{devId} and switchAddress = #{switchAddress}
+    </update>
+
+    <!--  更新合关闸时间(HHP)  -->
+    <update id="updateRecordTime">
+        update switch_info
+        <set>
+            <if test="switchStatus != null and switchStatus != '' " >
+                switchStatus = #{switchStatus},
+            </if>
+            recordTime = now()
+        </set>
+        where devId = #{devId}and switchAddress=#{switchAddress}
+    </update>
+    <!--  更新从机地址dev_info表(2020-5-12,HHP)  -->
+    <update id="updateDevId">
+        UPDATE dev_info SET devId=#{devIdNew} WHERE devId=#{devId}
+    </update>
+    <!--  更新从机地址switch_info表(2020-5-13,HHP)  -->
+    <update id="updateSwitchDevId">
+        UPDATE switch_info SET devId=#{devIdNew} WHERE devId=#{devId}
+    </update>
+    <!--  更新从机地址switch_info_history表(2020-5-13,HHP)  -->
+    <update id="updateHistoryDevId">
+        UPDATE switch_info_history SET devId=#{devIdNew} WHERE devId=#{devId}
+    </update>
+
+
+
+    <!--  更新空开实时信息表信息(2020-5-11，HHP)  -->
+    <!--
+        lineCurrent 线路电流
+        lineVoltage 线路电压
+        linePower 线路功率
+        leakageCurrent 漏电电流
+        moduleTemperature 模块温度
+    -->
+
+
+    <!--  在空开历史信息表中插入信息(2020-5-11，HHP)   -->
+    <insert id="insertToHistory">
+        insert  into switch_info_history (devSN,switchAddress,switchName,devId,recordTime,switchStatus,
+        lineCurrent,lineVoltage,linePower,leakageCurrent,moduleTemperature)
+        values (#{devSN},#{switchAddress},#{switchName},#{devId},now(),#{switchStatus},
+        #{lineCurrent},#{lineVoltage},#{linePower},#{leakageCurrent},#{moduleTemperature})
+    </insert>
+
+    <!--  wpp 2020-3-5 //查找区域树下的设备    -->
+    <select id="queryDevByTree" resultType="com.zy.SmartCampus.polo.DevInfo">
+        select * from dev_info where 1=1
+        <if test="id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+        <if test="devPostion != null and devPostion != '' ">
+            and devPostion = #{devPostion}
+        </if>
+        <if test="devName != null and devName != '' ">
+            and devName = #{devName}
+        </if>
+        <if test="devType != null and devType != '' ">
+            and devType = #{devType}
+        </if>
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <!--++++++++++++++++++++++++++++++++++++++空调信息+++++++++++++++++++++++++++++++++++++++++-->
+    <!--  查询air_info表信息(2020-5-14，HHP)  -->
+    <select id="queryAir" resultType="com.zy.SmartCampus.polo.AirInfo">
+        select id,devId,devSN,date_format(recordTime,'%Y-%c-%d %T')as recordTime,
+        temperature,humidity,infraredInduction,relayStatus
+        from air_info where 1=1
+        <if test="devSN != null and devSN != '' ">
+            and devSN = #{devSN}
+        </if>
+    </select>
+
+    <!--  更新继电器状态和时间(2020-5-14，HHP)  -->
+    <update id="updateAirStatus">
+        update air_info
+        <set>
+            <if test="relayStatus != null and relayStatus != '' " >
+                relayStatus = #{relayStatus},
+            </if>
+            recordTime = now()
+        </set>
+        where devId = #{devId}
+    </update>
+
+    <!--根据空调设备ID查询空调详细信息(2020-5-14,HHP)-->
+    <select id="queryAirDetailByDevId" resultType="com.zy.SmartCampus.polo.AirInfo">
+        select devId,devSN,devPostion,devType,devStatus ,devName
+        from air_info where 1=1
+        <if test="devId != null and devId != '' ">
+            and devId = #{devId}
+        </if>
+    </select>
+    <!--  更新空调实时信息表信息(2020-5-11，HHP)  -->
+    <!--
+        temperature 空调温度
+        humidity 空调湿度
+        infraredInduction 人体红外感应
+    -->
+    <update id="updateAirNewData">
+        update air_info
+        <set>
+            temperature = #{temperature},
+            humidity = #{humidity},
+            infraredInduction = #{infraredInduction},
+        </set>
+        where devId = #{devId}
+    </update>
+
+    <!--  在空调历史信息表中插入信息(2020-5-11，HHP)   -->
+    <insert id="insertAirToHistory">
+        insert  into air_info_history (devId,devName,devPostion,devStatus,devType,devSN,
+        temperature,humidity,infraredInduction,relayStatus,recordTime)
+        values (#{devId},#{devName},#{devPostion},#{devStatus},#{devType},#{devSN},
+        #{temperature},#{humidity},#{infraredInduction},#{relayStatus},now())
+    </insert>
+    <update id="updateAirDevId">
+        UPDATE dev_info SET devId=#{devIdNew} WHERE devId=#{devId}
+    </update>
+    <!--  更新从机地址air_info表(2020-5-13,HHP)  -->
+    <update id="updateAirInfoDevId">
+        UPDATE air_info SET devId=#{devIdNew} WHERE devId=#{devId}
+    </update>
+    <!--  更新从机地址air_info_history表(2020-5-13,HHP)  -->
+    <update id="updateAirHistoryDevId">
+        UPDATE air_info_history SET devId=#{devIdNew} WHERE devId=#{devId}
+    </update>
+    <!--根据开关地址（switchAddress）查询开关-->
+   <!-- <select id="querySwitchByAddress" resultType="com.zy.SmartCampus.polo.SwitchInfo">
+        select * from switch_info where switchAddress=#{switchAddress} and devId=#{devId}
+    </select>-->
+
+
+
+
+
+<!-- ////////////////////////////////////////////////////  switch line  ////////////////////////////////////////////////////////////  -->
+<!--对switch_info表添加对字段recordTime和字段switchStatus的新增更新查询的操作(HHP)-->
+<!--  查找开关by 设备id  -->
+<select id="querySwitch" resultType="com.zy.SmartCampus.polo.SwitchInfo">
+    select id,devSN,switchAddress,switchName,devId,switchStatus ,
+    date_format(recordTime,'%Y-%c-%d %T')as recordTime
+    from switch_info where 1=1
+    <if test="devSN != null and devSN != '' ">
+        and devSN = #{devSN}
+    </if>
+
+</select>
+
+<!--  更新开关  -->
+<update id="updateSwitch">
+        update switch_info set switchName = #{switchName} where id = #{id}
+    </update>
+
+
+
+
+
+</mapper>
+
+
+

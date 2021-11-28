@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.UserMapper" >
+    <!--  更新用户  -->
+    <update id="updateUser">
+        update user_info
+        <set>
+            <if test="password != null and password !=''">
+                password = #{password},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--  //查找用户  -->
+    <select id="queryUser" resultType="com.zy.SmartCampus.polo.UserInfo">
+        select * from user_info where 1=1
+        <if test="id != null and  id != '' ">
+            and id = #{id}
+        </if>
+        <if test="username != null and  username != '' ">
+            and username = #{username}
+        </if>
+        <if test="password != null and  password != '' ">
+            and password = #{password}
+        </if>
+        <if test="type != null and  type != '' ">
+            and type = #{type}
+        </if>
+    </select>
+
+    <!-- 增加用户-->
+    <insert id="insertUser">
+        insert into user_info(id,username,password,type)
+        values (#{id},#{username},#{password},#{type})
+    </insert>
+
+    <!-- 删除用户-->
+    <delete id="delUser">
+        delete from user_info where id=#{userid}
+    </delete>
+
+    <!-- 更新用户权限-->
+    <update id="updateUserInfo">
+        update user_info set type =#{type} where id=#{id}
+    </update>
+</mapper>
+
+
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.CrewMapper">
+    <select id="selectCrew" resultType="com.zy.SmartCampus.polo.Crew" parameterType="java.util.HashMap">
+        select * FROM crew
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+    <select id="selectCrewAll" resultType="com.zy.SmartCampus.polo.Crew">
+        select * FROM crew
+    </select>
+    <select id="selectCount" resultType="java.lang.Integer">
+        select COUNT(*) from crew
+    </select>
+    <delete id="delCrewByCid" parameterType="java.lang.Integer">
+        delete from crew
+        where Cid = #{id}
+    </delete>
+    <!--    添加Crew  -->
+    <insert id="addCrew" parameterType="com.zy.SmartCampus.polo.Crew" useGeneratedKeys="true">
+         insert into crew (CMstart,CMend,CNstart,CNend,Cdescribe,Cstart,Cend) values
+         (#{CMstart},#{CMend},#{CNstart},#{CNend},#{Cdescribe},#{Cstart},#{Cend});
+    </insert>
+<!--    更新排班计划-->
+    <update id="updateCrew" parameterType="com.zy.SmartCampus.polo.Crew">
+        update crew set CMstart = #{CMstart},CMend = #{CMend},
+        CNstart = #{CNstart},CNend = #{CNend},Cdescribe = #{Cdescribe},
+        Cstart = #{Cstart},Cend = #{Cend}
+        where Cid = #{Cid}
+    </update>
+</mapper>

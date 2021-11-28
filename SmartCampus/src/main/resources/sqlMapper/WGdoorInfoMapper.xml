@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.WGdoorMapper">
+
+
+    <!--新增门信息-->
+    <insert id="addDoor">
+        insert into wgaccess_door (id,ctrlerSN,readerID,doorID,doorName,doorCtrlWay,doorDelay,onUse,inType,outType,createdTime)
+        values (#{id},#{ctrlerSN},#{readerID},#{doorID},#{doorName},#{doorCtrlWay},#{doorDelay},#{onUse},#{inType},#{outType},now())
+    </insert>
+
+    <update id="updateDoor" parameterType="com.zy.SmartCampus.polo.WGAccessDoorInfo">
+        update wgaccess_door
+        <set>
+            <if test="doorName != null and doorName != '' " >
+                doorName = #{doorName},
+            </if>
+            <if test="doorDelay != null and doorDelay != '' " >
+                doorDelay = #{doorDelay},
+            </if>
+
+            <if test="doorCtrlWay != null and doorCtrlWay != '' " >
+                doorCtrlWay = #{doorCtrlWay},
+            </if>
+            <if test="onUse != null and onUse != '' " >
+                onUse = #{onUse},
+            </if>
+            <if test="inType != null and inType != '' " >
+                inType = #{inType},
+            </if>
+            <if test="outType != null and outType != '' " >
+                outType = #{outType},
+            </if>
+
+        </set>
+        where doorID = #{doorID}
+    </update>
+
+    <delete id="delDoor">
+        delete from wgaccess_door where ctrlerSN=#{ctrlerSN}
+    </delete>
+    <select id="queryDoor" resultType="com.zy.SmartCampus.polo.WGAccessDoorInfo">
+        select * from wgaccess_door where 1=1
+        <if test="ctrlerSN != null and ctrlerSN != ''">
+            and ctrlerSN = #{ctrlerSN}
+        </if>
+        order by doorID ASC
+    </select>
+
+    <select id="queryWGDoor" resultType="com.zy.SmartCampus.polo.WGAccessDoorInfo">
+        select a.*,DATE_FORMAT(createdTime,'%Y-%c-%d %T')AS strCreatedTime FROM wgaccess_door a,wgaccessdev_info b,organize_info c
+        where 1=1
+        <if test="doorID != null and doorID != '' ">
+            AND a.doorID =#{doorID}
+        </if>
+        <if test="doorName != null and doorName != '' ">
+            OR  doorName =#{doorName}
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND a.ctrlerSN=b.ctrlerSN and b.school =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND a.ctrlerSN=b.ctrlerSN and b.house =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND a.ctrlerSN=b.ctrlerSN and b.floor =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND a.ctrlerSN=b.ctrlerSN and b.room =#{roomId}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            AND a.ctrlerSN=b.ctrlerSN and b.status=#{devStatus}
+        </if>
+        GROUP BY doorID
+        <if test="offset!=null and limit!=null">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+</mapper>

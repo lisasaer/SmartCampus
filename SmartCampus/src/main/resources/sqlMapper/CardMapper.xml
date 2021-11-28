@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.CardMapper">
+
+<!--    查找全部卡   -->
+    <select id="selectAllCard" resultType="com.zy.SmartCampus.polo.CardBean" parameterType="java.util.HashMap">
+        SELECT a.cardDeviceId,b.`name`,b.cardNumber,c.dname FROM carddevice a LEFT JOIN (SELECT
+        d.`name`,b.cardNumber,b.cardId FROM card b
+        INNER JOIN staff d ON b.cardId=d.cardId)b on a.cardId=b.cardId
+        LEFT JOIN device c ON c.deviceId=a.deviceId
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="selectCount" resultType="java.lang.Integer">
+        select COUNT(*) from carddevice
+    </select>
+
+<!--    查找用户ID by 卡编号   -->
+    <select id="queryStaffIdByCardNumber" resultType="java.lang.String">
+        select staffId from card where cardNumber=#{cardNumber}
+    </select>
+
+<!--    查找 卡编号 by 卡ID   -->
+    <select id="queryCardNumberByCardId" resultType="java.lang.String">
+        select cardNumber from card where cardId=#{cardId}
+    </select>
+
+</mapper>

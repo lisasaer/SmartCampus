@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.VideoReplayInfoMapper" >
+
+
+    <!-- 添加录像回放实时视频 -->
+    <insert id="insertVideoReplayInfo">
+        insert into video_replay_info(id,szDeviceIdentify,szStartTime,szEndTime,fileSize)
+        values (#{id},#{szDeviceIdentify},#{szStartTime},#{szEndTime},#{fileSize})
+    </insert>
+
+    <!-- 删除录像回放实时视频 -->
+    <delete id="delVideoReplayInfo">
+        delete from video_replay_info
+    </delete>
+
+    <!-- 查询录像回放实时视频 -->
+    <select id="queryVideoReplayInfo" resultType="com.zy.SmartCampus.polo.VideoReplayInfo">
+        select * from video_replay_info
+        where 1=1
+        <if test="id != null and id !=''">
+            and id = #{id}
+        </if>
+        <if test="limit != null and limit != '' and offset != null and offset !='' ">
+            limit #{offset},#{limit}
+        </if>
+        order by szStartTime desc
+    </select>
+
+    <select id="queryVideoReplayInfoCount" resultType="java.lang.Integer">
+        select (count)* from video_replay_info
+    </select>
+
+</mapper>
+
+
+

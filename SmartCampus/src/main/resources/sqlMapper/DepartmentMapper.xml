@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.DepartmentMapper">
+    <resultMap id="BaseResultMap" type="com.zy.SmartCampus.polo.Department">
+        <id column="departmentId" property="departmentid" jdbcType="INTEGER"/>
+        <result column="dName" property="dname" jdbcType="VARCHAR"/>
+        <result column="dNum" property="dnum" jdbcType="INTEGER"/>
+        <result column="position" property="position" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        departmentId, dName, dNum, position
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zy.SmartCampus.polo.DepartmentExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from department
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectRootDepartmentTree" resultType="com.zy.SmartCampus.polo.DepartmentTree">
+        select parentId,dName 'title',departmentId 'rootId' from department WHERE 1=1 ORDER BY rootId
+    </select>
+    <select id="selectDepartmentTreeByParentId" resultType="com.zy.SmartCampus.polo.DepartmentTree"
+            parameterType="java.lang.Integer">
+        select dName 'title',departmentId 'rootId',parentId from department where parentId=#{parentId}
+    </select>
+    <select id="selectDepartmentName" resultType="com.zy.SmartCampus.polo.Department">
+        select dName,departmentId from department
+    </select>
+    <select id="selectCascadeDepartmentName">
+
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from department
+        where departmentId = #{departmentid,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from department
+        where departmentId = #{departmentid,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zy.SmartCampus.polo.DepartmentExample">
+        delete from department
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zy.SmartCampus.polo.Department">
+        insert into department (departmentId, dName, dNum,
+        position)
+        values (#{departmentid,jdbcType=INTEGER}, #{dname,jdbcType=VARCHAR}, #{dnum,jdbcType=INTEGER},
+        #{position,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zy.SmartCampus.polo.Department">
+        insert into department
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="departmentid != null">
+                departmentId,
+            </if>
+            <if test="dname != null">
+                dName,
+            </if>
+            <if test="dnum != null">
+                dNum,
+            </if>
+            <if test="position != null">
+                position,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="departmentid != null">
+                #{departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="dname != null">
+                #{dname,jdbcType=VARCHAR},
+            </if>
+            <if test="dnum != null">
+                #{dnum,jdbcType=INTEGER},
+            </if>
+            <if test="position != null">
+                #{position,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zy.SmartCampus.polo.DepartmentExample" resultType="java.lang.Integer">
+        select count(*) from department
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update department
+        <set>
+            <if test="record.departmentid != null">
+                departmentId = #{record.departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="record.dname != null">
+                dName = #{record.dname,jdbcType=VARCHAR},
+            </if>
+            <if test="record.dnum != null">
+                dNum = #{record.dnum,jdbcType=INTEGER},
+            </if>
+            <if test="record.position != null">
+                position = #{record.position,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update department
+        set departmentId = #{record.departmentid,jdbcType=INTEGER},
+        dName = #{record.dname,jdbcType=VARCHAR},
+        dNum = #{record.dnum,jdbcType=INTEGER},
+        position = #{record.position,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zy.SmartCampus.polo.Department">
+        update department
+        <set>
+            <if test="dname != null">
+                dName = #{dname,jdbcType=VARCHAR},
+            </if>
+            <if test="dnum != null">
+                dNum = #{dnum,jdbcType=INTEGER},
+            </if>
+            <if test="position != null">
+                position = #{position,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where departmentId = #{departmentid,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zy.SmartCampus.polo.Department">
+        update department
+        set dName = #{dname,jdbcType=VARCHAR},
+        dNum = #{dnum,jdbcType=INTEGER},
+        position = #{position,jdbcType=VARCHAR}
+        where departmentId = #{departmentid,jdbcType=INTEGER}
+    </update>
+    <insert id="addFirstDepartment" parameterType="com.zy.SmartCampus.polo.Department">
+        INSERT INTO department (departmentid,dName) values (#{departmentid},#{dname})
+    </insert>
+    <insert id="addDepartment" parameterType="com.zy.SmartCampus.polo.Department">
+        INSERT INTO department (parentId,dName) values (#{parentId},#{dname})
+    </insert>
+    <update id="editDepartment" parameterType="com.zy.SmartCampus.polo.Department">
+        update department
+        <set>
+            <if test="dname != null">
+                dName = #{dname}
+            </if>
+        </set>
+        where departmentId = #{departmentid}
+    </update>
+    <delete id="deleteDepartment" >
+        delete from department where departmentId = #{departmentid}
+    </delete>
+
+    <select id="queryDepartmentByParentId" resultType="com.zy.SmartCampus.polo.Department">
+        select * from department
+        where parentId = #{departmentId}
+    </select>
+</mapper>

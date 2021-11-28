@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zy.SmartCampus.mapper.DeviceMapper">
+
+    <select id="selectDeviceAll" resultType="com.zy.SmartCampus.polo.Device" parameterType="java.util.HashMap">
+        select a.* ,DATE_FORMAT(createdTime,'%Y-%c-%d %T')AS strCreatedTime FROM dev_info_hk a
+        order by createdTime desc
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <select id="selectCount" resultType="java.lang.Integer">
+        select COUNT(*) from dev_info_hk
+        where 1=1
+        <if test="schoolId != null and schoolId != '' ">
+            AND schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND roomId =#{roomId}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            AND devStatus =#{devStatus}
+        </if>
+    </select>
+
+    <insert id="addDevice" parameterType="com.zy.SmartCampus.polo.Device">
+        INSERT into dev_info_hk (dname,dtype,dip,dnetMask,dgateWay,duser,dpassWord,dposition,port,schoolId,houseId,floorId,roomId,createdTime) VALUES
+        (#{dname},#{dtype},#{dip},#{dnetMask},#{dgateWay},#{duser},#{dpassWord},#{dposition},#{port},#{schoolId},#{houseId},#{floorId},#{roomId},#{createdTime})
+    </insert>
+
+    <delete id="delDevice" parameterType="java.lang.Integer">
+        delete from dev_info_hk where deviceId=#{id}
+    </delete>
+
+    <select id="selectDeviceByDepartmentIdCard" parameterType="java.lang.Integer"
+            resultType="com.zy.SmartCampus.polo.manageDeviceBean">
+        select a.dname "title",a.deviceId "value",b.dName "departmentName"
+        FROM dev_info_hk a
+        LEFT JOIN department b ON a.departmentId=b.departmentId
+        WHERE b.departmentId=#{0}
+    </select>
+
+    <select id="queryDeviceIdByDip" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select deviceId from dev_info_hk where dIp=#{dIp}
+    </select>
+
+    <select id="queryDeviceIpById" resultType="java.lang.String">
+        select dIp from dev_info_hk where deviceId=#{id}
+    </select>
+
+<!--    ID查找设备IP    -->
+    <select id="getDevIPByID" resultType="java.lang.String">
+        select dip from dev_info_hk where deviceId = #{0}
+    </select>
+    <!--    ID查找微耕设备IP    -->
+    <select id="getWgDevIPByID" resultType="java.lang.String">
+        select a.ip from wgaccessdev_info a, wgaccess_door b where a.ctrlerSN=b.ctrlerSN and b.doorID = #{0}
+    </select>
+<!--    IP查找ID      -->
+    <select id="getDevIDByIP" resultType="java.lang.String">
+        select deviceId from dev_info_hk where dip = #{0}
+    </select>
+<!--    更新设备-->
+    <update id="updateDevice" parameterType="com.zy.SmartCampus.polo.Device">
+         update dev_info_hk set dname = #{dname},dtype = #{dtype},
+         duser = #{duser},dpassWord = #{dpassWord},schoolId=#{schoolId},houseId=#{houseId},floorId=#{floorId},roomId=#{roomId}
+         where deviceId = #{deviceId};
+    </update>
+
+    <select id="queryConditionDev" resultType="com.zy.SmartCampus.polo.Device">
+        select a.*,DATE_FORMAT(createdTime,'%Y-%c-%d %T')AS strCreatedTime FROM dev_info_hk a
+        where 1=1
+       <!-- <if test="departmentName != null and departmentName != '' ">
+            AND b.dName =#{departmentName}
+        </if>-->
+        <if test="deviceId != null and deviceId != '' ">
+            AND a.deviceId =#{deviceId}
+        </if>
+        <if test="dip != null and dip != '' ">
+            AND dip LIKE "%"#{dip}"%"
+        </if>
+        <if test="dname != null and dname != '' ">
+            OR a.dname LIKE "%"#{dname}"%"
+        </if>
+        <if test="schoolId != null and schoolId != '' ">
+            AND a.schoolId =#{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            AND a.houseId =#{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            AND a.floorId =#{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            AND a.roomId =#{roomId}
+        </if>
+        <if test="devStatus != null and devStatus != '' ">
+            AND a.devStatus =#{devStatus}
+        </if>
+        GROUP BY createdTime DESC
+        <if test="offset!=null and limit!=null">
+            limit #{offset},#{limit}
+        </if>
+    </select>
+
+    <select id="queryConditionDevCount" resultType="java.lang.Integer">
+        select COUNT(*) FROM dev_info_hk
+        where 1=1
+        <if test="dip != null and dip != '' ">
+            AND dip LIKE "%"#{dip}"%"
+        </if>
+        <if test="dname != null and dname != '' ">
+            OR dname LIKE "%"#{dname}"%"
+        </if>
+
+    </select>
+
+    <select id="queryDevByDepartmentId" resultType="com.zy.SmartCampus.polo.Device">
+        select * from dev_info_hk
+        where departmentId = #{departmentId}
+    </select>
+
+
+    <update id="updateDevOnLine" parameterType="com.zy.SmartCampus.polo.Device">
+         update dev_info_hk set devStatus = 1
+         where deviceId = #{deviceId};
+    </update>
+    <update id="updateDevOffLine" parameterType="com.zy.SmartCampus.polo.Device">
+         update dev_info_hk set devStatus = 0
+    </update>
+    <select id="queryNewDev" resultType="com.zy.SmartCampus.polo.Device">
+        select a.* FROM dev_info_hk a
+        GROUP BY deviceId desc
+        limit 0,1
+    </select>
+
+    <select id="queryHKDevByArea" resultType="com.zy.SmartCampus.polo.Device">
+        select * from dev_info_hk where  1=1
+        <if test="schoolId != null and schoolId != '' ">
+            and schoolId = #{schoolId}
+        </if>
+        <if test="houseId != null and houseId != '' ">
+            and houseId = #{houseId}
+        </if>
+        <if test="floorId != null and floorId != '' ">
+            and floorId = #{floorId}
+        </if>
+        <if test="roomId != null and roomId != '' ">
+            and roomId = #{roomId}
+        </if>
+
+    </select>
+    <select id="queryByDevIP" resultType="com.zy.SmartCampus.polo.Device">
+        select * from  dev_info_hk
+        where dip = #{dip}
+    </select>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.zy.SmartCampus.mapper.OrganizeMapper" >
+
+    <!--  //添加组织    -->
+    <insert id="insertOrganize">
+        insert into organize_info(id,text,state,iconCls,pId)
+        values (#{id},#{text},#{state},#{iconCls},#{pId})
+    </insert>
+
+    <!--    //修改组织 -->
+    <update id="updateOrganize">
+        update organize_info
+        <set>
+            <if test="text != null and text !='' ">
+                text = #{text},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--   //删除组织  -->
+    <delete id="delOrganize">
+       delete from organize_info where id = #{0}
+    </delete>
+
+    <!--   //查找子组织 -->
+    <select id="queryChildenOrganize" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where pId = #{pId}
+        <if test="iconCls != null and iconCls != '' ">
+            <!--    屏蔽 监控节点    -->
+            and  iconCls != 'my-tree-icon-6'
+        </if>
+        order by text
+    </select>
+    <select id="queryVideoChildrenOrganize" resultType="com.zy.SmartCampus.polo.EasyTree">
+SELECT * FROM((SELECT id,`text`,`iconCls`,`pId` FROM organize_info)
+	UNION ALL
+(SELECT id,devName TEXT , iconCls,pId FROM video_info ))a
+WHERE pId = #{pId}
+    </select>
+    <!--   //查找父组织  -->
+    <select id="queryParent" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where id = (select pId from organize_info where id = #{0})
+    </select>
+
+    <select id="queryCurrId" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where id = #{0}
+    </select>
+
+    <select id="queryByName" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where text = #{0}
+    </select>
+<!--    <select id="queryHouse" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where text = #{0} and pid=#{1}
+    </select>
+    <select id="queryByName" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where text = #{0}
+    </select>
+    <select id="queryByName" resultType="com.zy.SmartCampus.polo.EasyTree">
+        select * from organize_info where text = #{0}
+    </select>-->
+</mapper>
+
+
+
